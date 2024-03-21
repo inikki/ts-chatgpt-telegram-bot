@@ -1,0 +1,36 @@
+{
+  "name": "ts-chat-gpt-telegram-bot",
+  "description": "ChatGpt Telegram Bot",
+  "version": "1.0.0",
+  "author": "Nikoleta Menyhartova",
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "express": "^4.18.3",
+    "inquirer": "^9.2.16",
+    "node-telegram-bot-api": "^0.65.1",
+    "openai": "^4.28.4",
+    "redis": "^4.6.13",
+    "winston": "^3.12.0"
+  },
+  "scripts": {
+    "start": "node dist/index.js",
+    "test": "node --env-file=.env dist/index.js",
+    "build": "esbuild src/index.ts --platform=node --bundle --minify --outfile=dist/index.js",
+    "local": "esbuild scripts/local-chat-app.ts --platform=node --bundle --minify --outfile=dist/local-chat-app.ts && node dist/local-chat-app.ts"
+
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.11.25",
+    "@types/node-telegram-bot-api": "^0.64.3",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "esbuild": "^0.20.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5"
+  }
+}
