@@ -19,7 +19,6 @@
     "test": "node --env-file=.env dist/index.js",
     "build": "esbuild src/index.ts --platform=node --bundle --minify --outfile=dist/index.js",
     "local": "esbuild scripts/local-chat-app.ts --platform=node --bundle --minify --outfile=dist/local-chat-app.ts && node dist/local-chat-app.ts"
-
   },
   "devDependencies": {
     "@types/express": "^4.17.21",

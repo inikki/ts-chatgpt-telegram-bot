@@ -55,11 +55,9 @@ export const setChatGptModel =
     }
 
 export const getChatGptModel =
-    (redisClient: RedisClientAdapter, chatId: number) =>
-    async ({ chatGptModelType }: { chatGptModelType: SupportedModels }) => {
+    (redisClient: RedisClientAdapter, chatId: number) => async () => {
         logger.log('info', {
             name: 'openAi.functions.getChatGptModel',
-            chatGptModelType,
         })
 
         await redisClient.get(`model:${chatId}`)

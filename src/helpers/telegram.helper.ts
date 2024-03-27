@@ -23,16 +23,24 @@ export const handleTelegramMessage = async (message: TelegramBot.Message) => {
 
     logger.log('info', message)
 
+    const message_id = await telegramClient.sendMessage('...', chatId)
+
     // call openAI
-    const response =
-        (await openAiClient.runPrompt(message?.text || '', {
+    const stringStream =
+        (await openAiClient.runPrompt(message?.text || 'Recieved empty text', {
             chatId,
             chatType,
             userId,
             userFirstName,
-        } as ChatData)) || 'No response from assistant, sorry.'
-    logger.log('info', response)
+        } as ChatData)) ?? []
 
-    // call Telegram
-    await telegramClient.sendMessage(response, chatId || 0)
+    logger.log('info', stringStream)
+
+    for await (const chunk of stringStream) {
+        // call Telegram
+        console.log('???chunk string in TELEGRAM', chunk)
+        if (chunk) {
+            await telegramClient.updateMessage(chunk, chatId, message_id)
+        }
+    }
 }
