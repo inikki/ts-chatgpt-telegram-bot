@@ -1,12 +1,12 @@
-import { OpenAI } from 'openai'
+import { OpenAI, toFile } from 'openai'
 import type {
   ChatCompletionAssistantMessageParam,
-  ChatCompletionMessage,
+  ChatCompletionChunk,
   ChatCompletionMessageParam,
   ChatCompletionMessageToolCall,
-  ChatCompletionToolMessageParam,
   ChatCompletionUserMessageParam,
 } from 'openai/resources'
+import { Stream } from 'openai/streaming'
 import { logger } from '../../helpers/logger.helper'
 import { ChatData } from '../../interfaces/telegram'
 import { RedisClientAdapter } from '../redis/adapter'
@@ -18,7 +18,7 @@ import {
 } from './helpers/functions'
 import { tools } from './helpers/tools'
 import { defaultMood, generateInstructions } from './instructions'
-import { Messages } from 'openai/resources/beta/threads/messages/messages'
+import { Readable } from 'stream'
 
 export class OpenAiClient {
   private openAi: OpenAI
@@ -89,13 +89,15 @@ export class OpenAiClient {
   }
 
   private async processStream(
-    resultStream,
+    resultStream: Stream<ChatCompletionChunk>,
     prompt: string,
     chatId: number,
     currentMessages: ChatCompletionMessageParam[],
     currentChatGptModel: string
   ) {
-    const responseText = async function* (this: OpenAiClient) {
+    const responseText: AsyncIterable<string> = async function* (
+      this: OpenAiClient
+    ) {
       const accumulatedArguments: string[] = []
       let accumulatedContent: string = ''
       let accumulatedToolCalls: OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta.ToolCall[] =
@@ -105,6 +107,7 @@ export class OpenAiClient {
         const content = chunk.choices[0].delta.content
         if (content) {
           accumulatedContent += content
+
           yield accumulatedContent
         }
 
@@ -143,7 +146,7 @@ export class OpenAiClient {
         }
       }
 
-      // Add response context to redis
+      // Add response context to redis in case of response
       if (accumulatedContent) {
         // save prompt and response
         await this.redisClient.listPush(chatId.toString(), [
@@ -203,32 +206,38 @@ export class OpenAiClient {
           })
         }
 
-        const secondResponse = await this.openAi.chat.completions.create({
+        const secondResponseStream = await this.openAi.chat.completions.create({
           model: currentChatGptModel,
           temperature: 0.7,
           messages: currentMessages,
+          stream: true,
         })
-        const secondResponseText = secondResponse.choices[0].message.content
+
+        let secondAccumulatedContent = ''
+        for await (const chunk of secondResponseStream) {
+          console.log('????CHUNK2', chunk.choices[0].delta)
+          const content = chunk.choices[0].delta.content
+          if (content) {
+            secondAccumulatedContent += content
+            yield secondAccumulatedContent
+          }
+        }
 
         // Save prompt and response
         await this.redisClient.listPush(chatId.toString(), [
           `user:${prompt}`,
-          `assistant:${secondResponseText}`,
+          `assistant:${secondAccumulatedContent}`,
         ])
 
         logger.log('info', {
           name: 'openAiClient.toolChoice.output',
-          response: [prompt, secondResponseText],
+          response: [prompt, secondAccumulatedContent],
         })
-
-        yield secondResponse.choices[0].message.content as string
       }
     }.call(this)
 
     return responseText
   }
-
-  private async handleToolCalls() {}
 
   private async preparePreviousContext(
     chatId: string,
@@ -274,5 +283,26 @@ export class OpenAiClient {
     }
 
     return currentMessages
+  }
+
+  async audioToText(audio: Buffer, fileName?: string) {
+    const convertedFile = await toFile(Readable.from(audio), fileName)
+
+    const transcription = await this.openAi.audio.transcriptions.create({
+      file: convertedFile,
+      model: 'whisper-1',
+    })
+
+    return transcription.text
+  }
+
+  async textToAudio(text: string) {
+    const speech = await this.openAi.audio.speech.create({
+      input: text,
+      model: 'tts-1',
+      voice: 'nova',
+    })
+
+    return speech
   }
 }

@@ -25,6 +25,14 @@ export class TelegramClient {
       }
     })
 
+    this.bot.on('polling_error', (error) => {
+      console.error('Polling error:', error)
+    })
+
+    this.bot.on('error', (error) => {
+      console.error('Error:', error)
+    })
+
     this.bot.startPolling()
     logger.log('info', { name: 'telegramClient.startPolling.succesfull' })
   }
@@ -72,5 +80,18 @@ export class TelegramClient {
       message_id: messageId,
     })
     logger.log('info', { name: 'telegramClient.updateMessage.succesfull' })
+  }
+
+  async getFileLink(fileId: string) {
+    logger.log('debug', {
+      name: 'telegramClient.getFileLink.input',
+    })
+
+    const fileLink = await this.bot.getFileLink(fileId)
+    logger.log('info', {
+      name: 'telegramClient.getFileLink.succesfull',
+      fileLink,
+    })
+    return fileLink
   }
 }

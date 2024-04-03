@@ -7,7 +7,7 @@ export function generateInstructions(mood: string = defaultMood): string {
     Introduce yourself at the beginning.
     Be ${mood}.
     Use smiles.
-    
+
     You are answering questions about AI, but you need to be careful to recognize specific questions. 
     
     These are specific commands you need to work with, user will pick one from telegram coversation as telegram commands from the menu.

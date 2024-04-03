@@ -1,6 +1,6 @@
 # TS ChatGPT Telegram Bot
 
-This repository contains the source code for a Telegram bot powered by ChatGPT. It's seamlessly integrated with OpenAI Streams, compatible with tool choices, allowing users to interact with an AI-powered chatbot directly from their Telegram app.
+This repository contains the source code for a Telegram bot powered by ChatGPT. It's seamlessly integrated with `OpenAI Streams`, compatible with `tool choices`, allowing users to interact with an AI-powered chatbot directly from their Telegram app.
 
 ## Prerequisites
 
@@ -52,13 +52,14 @@ We have 2 option how to connect telegram now. We can use webhooks or long pollin
 
 ### Long Polling
 
-set env `LONG_POLLING_FLAG=true` (default)
+Set env variable `LONG_POLLING_FLAG=true` (default).
+This will start bot and poll messages.
 
 ```ts
 docker-compose up
 ```
 
-or when you need to rebuild image:
+or when you also need to rebuild image:
 
 ```ts
 make start
@@ -71,6 +72,19 @@ To check messages, you can run `make getUpdates`
 1. You will need domain or a public url with SSL certificate. Save it in env `SSL_URL`
 2. Create secret token to secure communication `TELEGRAM_SECRET_TOKEN`. Only characters A-Z, a-z, 0-9, \_ and - are allowed.
 3. run `make set-webhook`
+4. Make sure, variable `LONG_POLLING_FLAG` is not defined.
+
+```ts
+docker-compose up
+```
+
+or when you need to rebuild image:
+
+```ts
+make start
+```
+
+Send message with curl (or postman) if you don't have app deployed:
 
 ```example curl
 curl --location 'http://localhost:7999/telegram-webhook' \
@@ -109,5 +123,10 @@ curl --location 'http://localhost:7999/telegram-webhook' \
 ```ts
 cd infra
 pullumi up
+```
+
+## Remove the telegram from Kubernetes
+
+```ts
 pullumi destroy
 ```

@@ -4,6 +4,8 @@ import { ChatData } from '../interfaces/telegram'
 import { TelegramClient } from '../adapter/telegram/adapter'
 import { openAiClient } from './open-ai.helper'
 import { generateInstructions } from '../adapter/openai/instructions'
+import { collectChunksForDuration, getRandomInt } from './chunks.helper'
+import { downloadFileToMemory } from './axios.helper'
 
 // TELEGRAM
 const botToken = process.env.TELEGRAM_BOT_TOKEN
@@ -13,34 +15,56 @@ const instructions = generateInstructions()
 export const telegramClient = new TelegramClient(botToken, apiKey, instructions)
 
 export const handleTelegramMessage = async (message: TelegramBot.Message) => {
+  try {
     const chatId = message?.chat.id
     const chatType = message?.chat.type
     const userId = message?.from?.id
     const userFirstName = message?.from?.first_name
 
-    // const textMessage = message?.text
-    // const videoMessage = message?.video
+    let textMessage = message?.text
+    const audioMessage = message?.voice
 
     logger.log('info', message)
 
-    const message_id = await telegramClient.sendMessage('...', chatId)
+    const messageId = await telegramClient.sendMessage('...', chatId)
+
+    if (audioMessage) {
+      const fileId = audioMessage.file_id
+      const getFileUrl = await telegramClient.getFileLink(fileId)
+      const data = await downloadFileToMemory(getFileUrl)
+
+      textMessage = await openAiClient.audioToText(data, 'file_11.oga')
+      console.log('??textMessage', textMessage)
+    }
 
     // call openAI
     const stringStream =
-        (await openAiClient.runPrompt(message?.text || 'Recieved empty text', {
-            chatId,
-            chatType,
-            userId,
-            userFirstName,
-        } as ChatData)) ?? []
+      (await openAiClient.runPrompt(textMessage || 'Recieved empty text', {
+        chatId,
+        chatType,
+        userId,
+        userFirstName,
+      } as ChatData)) ?? []
 
     logger.log('info', stringStream)
 
-    for await (const chunk of stringStream) {
+    const durationInMs = getRandomInt(90, 150)
+
+    for await (const chunk of collectChunksForDuration(
+      stringStream,
+      durationInMs
+    )) {
+      if (chunk && chunk.trim() !== '') {
+        logger.log('info', { name: 'telegramHelper.chunk', chunk })
         // call Telegram
-        console.log('???chunk string in TELEGRAM', chunk)
-        if (chunk) {
-            await telegramClient.updateMessage(chunk, chatId, message_id)
-        }
+        await telegramClient.updateMessage(chunk, chatId, messageId)
+      }
     }
+  } catch (error) {
+    logger.log('error', {
+      error,
+      status: error.statusCode,
+      message: error.message,
+    })
+  }
 }
