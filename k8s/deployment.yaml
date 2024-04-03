@@ -1,0 +1,38 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: telegram-express-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: telegram-express-app
+  template:
+    metadata:
+      labels:
+        app: telegram-express-app
+    spec:
+      containers:
+        - name: telegram-express-app
+          image: 'your-container-registry/telegram-express-app:openai' # your containter registry
+          ports:
+            - containerPort: 80
+          env:
+            - name: REDIS_HOST
+              value: 'redis-service'
+            - name: REDIS_PORT
+              value: '6379'
+            - name: OPEN_AI_KEY
+              value: 'your-open-ai-key' # add your value
+            - name: TELEGRAM_BOT_TOKEN
+              value: 'your-telegram-bot-token' # add your value
+            - name: TELEGRAM_SECRET_TOKEN
+              value: 'your-secret-token' # add your value, only if using webhooks
+            - name: LONG_POLLING_FLAG
+              value: 'true'
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10

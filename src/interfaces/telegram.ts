@@ -1,8 +1,8 @@
-import { ChatType } from 'node-telegram-bot-api'
+import { ChatType } from 'node-telegram-bot-api';
 
 export interface ChatData {
-    chatId: number
-    chatType: ChatType
-    userId: number
-    userFirstName: string
+  chatId: number;
+  chatType: ChatType;
+  userId: number;
+  userFirstName: string;
 }
