@@ -14,7 +14,7 @@ app.use(chatBot);
 app.use(healthCheck);
 
 if (process.env.LONG_POLLING_FLAG) {
-  await telegramClient.runBot();
+  telegramClient.runBot();
 } else {
   app.use(telegramWebhook);
 }

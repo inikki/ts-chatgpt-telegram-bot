@@ -32,7 +32,7 @@ export class OpenAiClient {
     this.redisClient = new RedisClientAdapter();
   }
 
-  async runPrompt(prompt: string, chatData: ChatData) {
+  async runPrompt(prompt: string, chatData: ChatData): Promise<string | AsyncIterable<string>> {
     try {
       logger.log('info', { name: 'openAi.runPrompt.input', prompt });
       const { chatId } = chatData;
@@ -80,7 +80,7 @@ export class OpenAiClient {
         temperature: 0.7,
         messages: [{ role: 'system', content: JSON.stringify(error) }],
       });
-      return errorResponse.choices[0].message.content;
+      return errorResponse.choices[0].message.content ?? '';
     }
   }
 
@@ -90,7 +90,7 @@ export class OpenAiClient {
     chatId: number,
     currentMessages: ChatCompletionMessageParam[],
     currentChatGptModel: string,
-  ) {
+  ): Promise<AsyncIterable<string>> {
     const responseText: AsyncIterable<string> = async function* (this: OpenAiClient) {
       const accumulatedArguments: string[] = [];
       let accumulatedContent: string = '';
@@ -158,7 +158,8 @@ export class OpenAiClient {
           accumulatedToolCalls,
         });
 
-        const availableFunctions = {
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        const availableFunctions: Record<string, Function> = {
           getUsagePerSpecificDate,
           changeBotMood: changeBotMood(this.redisClient, chatId),
           setChatGptModel: setChatGptModel(this.redisClient, chatId),
@@ -274,7 +275,7 @@ export class OpenAiClient {
     return currentMessages;
   }
 
-  async audioToText(audio: Buffer, fileName?: string) {
+  async audioToText(audio: Buffer, fileName?: string): Promise<string> {
     const convertedFile = await toFile(Readable.from(audio), fileName);
 
     const transcription = await this.openAi.audio.transcriptions.create({

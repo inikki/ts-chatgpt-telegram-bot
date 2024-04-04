@@ -22,7 +22,7 @@ export const getUsagePerSpecificDate = async ({
 
 export const changeBotMood =
   (redisClient: RedisClientAdapter, chatId: number) =>
-  async ({ mood }: { mood: string }) => {
+  async ({ mood }: { mood: string }): Promise<string> => {
     logger.log('info', {
       name: 'openAi.functions.changeBotMood',
       mood,
@@ -40,7 +40,7 @@ enum SupportedModels {
 
 export const setChatGptModel =
   (redisClient: RedisClientAdapter, chatId: number) =>
-  async ({ chatGptModelType }: { chatGptModelType: SupportedModels }) => {
+  async ({ chatGptModelType }: { chatGptModelType: SupportedModels }): Promise<string> => {
     logger.log('info', {
       name: 'openAi.functions.setChatGptModel',
       chatGptModelType,

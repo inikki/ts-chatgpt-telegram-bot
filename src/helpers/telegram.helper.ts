@@ -37,13 +37,12 @@ export const handleTelegramMessage = async (message: TelegramBot.Message) => {
     }
 
     // call openAI
-    const stringStream =
-      (await openAiClient.runPrompt(textMessage || 'Recieved empty text', {
-        chatId,
-        chatType,
-        userId,
-        userFirstName,
-      } as ChatData)) ?? [];
+    const stringStream = await openAiClient.runPrompt(textMessage || 'Recieved empty text', {
+      chatId,
+      chatType,
+      userId,
+      userFirstName,
+    } as ChatData);
 
     logger.log('info', stringStream);
 
