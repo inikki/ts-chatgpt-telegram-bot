@@ -8,6 +8,10 @@ This repository contains the source code for a Telegram bot powered by ChatGPT b
 
 Additionally, context information is stored in a `Redis cache`, ensuring smooth and continuous conversations with the bot.
 
+<img src="https://github.com/inikki/ts-chatgpt-telegram-bot/assets/16180634/84da7a8e-e27a-4959-8005-d707ae4e1b6a" width="200">
+<img src="https://github.com/inikki/ts-chatgpt-telegram-bot/assets/16180634/628364a4-3643-402d-a3bb-a846a186229c" width="200">
+<img src="https://github.com/inikki/ts-chatgpt-telegram-bot/assets/16180634/50052ded-cd29-431e-896f-174ff7b6a053" width="200">
+
 ## Prerequisites
 
 Before diving in, ensure you have the following installed:
@@ -59,8 +63,6 @@ make local
 <img src="https://github.com/inikki/ts-chatgpt-telegram-bot/assets/16180634/9c836d7d-7561-441b-bd64-ec90164c248e" width="500">
 
 ## Running the telegram bot locally
-
-<img src="https://github.com/inikki/ts-chatgpt-telegram-bot/assets/16180634/628364a4-3643-402d-a3bb-a846a186229c" width="300"><img src="https://github.com/inikki/ts-chatgpt-telegram-bot/assets/16180634/50052ded-cd29-431e-896f-174ff7b6a053" width="300">
 
 We have two options how to use telegram. We can use webhooks or long polling (but not both):
 
