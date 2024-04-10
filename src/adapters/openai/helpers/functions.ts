@@ -1,3 +1,4 @@
+import config from '../../../env';
 import { getData } from '../../../helpers/axios.helper';
 import { logger } from '../../../helpers/logger.helper';
 import { RedisClientAdapter } from '../../redis/adapter';
@@ -12,7 +13,7 @@ export const getUsagePerSpecificDate = async ({
     date: usageDate,
   });
 
-  const token = process.env.OPEN_AI_KEY;
+  const token = config.OPEN_AI_KEY;
   const url = `https://api.openai.com/v1/usage?date=${usageDate}`;
 
   logger.log('info', { name: 'functions.getUsagePerSpecificDate.url', url });

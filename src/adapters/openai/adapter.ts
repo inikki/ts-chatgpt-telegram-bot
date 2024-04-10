@@ -108,7 +108,9 @@ export class OpenAiClient {
         const toolCalls = chunk.choices[0].delta.tool_calls;
 
         if (toolCalls) {
-          const index = chunk.choices[0].delta.tool_calls?.[0].index;
+          const toolCall = toolCalls[0];
+          const index = toolCall.index;
+
           if (index === undefined) {
             throw new Error('Index is undefined');
           }
@@ -118,8 +120,7 @@ export class OpenAiClient {
           );
           if (existingIndex !== -1) {
             // If the index exists, concatenate the arguments
-            accumulatedArguments[index] +=
-              chunk.choices[0].delta.tool_calls?.[0].function?.arguments;
+            accumulatedArguments[index] += toolCall.function?.arguments;
 
             accumulatedToolCalls = accumulatedToolCalls.map((toolCall) => {
               return {
@@ -132,13 +133,13 @@ export class OpenAiClient {
             });
           } else {
             // If the index doesn't exist, push a new object with the index and arguments
-            accumulatedToolCalls.push(chunk.choices[0].delta.tool_calls?.[0] ?? { index });
+            accumulatedToolCalls.push(toolCall ?? { index });
             accumulatedArguments[index] = '';
           }
         }
       }
 
-      // Add response context to redis in case of response
+      // Add response context to redis in case of content
       if (accumulatedContent) {
         // save prompt and response
         await this.redisClient.listPush(chatId.toString(), [

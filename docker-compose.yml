@@ -7,6 +7,9 @@ services:
       - "7999:8080"
     env_file:
       - .env
+    environment:
+      - REDIS_HOST=ts-chatgpt-telegram-bot-cache-redis-1
+      - REDIS_PORT=6379
   cache-redis:
     image: redis:7.2.4-alpine
     restart: always

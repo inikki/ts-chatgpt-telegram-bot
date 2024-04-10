@@ -3,10 +3,11 @@ import { logger } from '../helpers/logger.helper';
 
 import TelegramBot, { Update } from 'node-telegram-bot-api';
 import { handleTelegramMessage } from '../helpers/telegram.helper';
+import config from '../env';
 
 const router: Router = Router();
 
-const secretToken = process.env.TELEGRAM_SECRET_TOKEN;
+const secretToken = config.TELEGRAM_WEBHOOK_SECRET_TOKEN;
 
 /* Telegram webhooks, usage disabled by default*/
 router.post('/telegram-webhook', async (req: Request, res: Response) => {

@@ -1,13 +1,13 @@
 {
-    "compilerOptions": {
-      "outDir": "./dist",                      
-      "esModuleInterop": true,      
-      "strict": true,
-      "target": "es2017",
-      "module": "commonjs",
-      "moduleResolution": "node",
-      "sourceMap": true,
-      "experimentalDecorators": true,    
-      "useUnknownInCatchVariables": false       
-    }
+  "compilerOptions": {
+    "outDir": "./dist",                      
+    "esModuleInterop": true,      
+    "strict": true,
+    "target": "es2017",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "experimentalDecorators": true,    
+    "useUnknownInCatchVariables": false       
   }
+}

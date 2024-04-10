@@ -6,11 +6,12 @@ import { openAiClient } from './open-ai.helper';
 import { generateInstructions } from '../adapters/openai/instructions';
 import { collectChunksForDuration, getRandomInt } from './collect-chunks.helper';
 import { downloadFileToMemory } from './axios.helper';
+import config from '../env';
 
 // TELEGRAM
-const botToken = process.env.TELEGRAM_BOT_TOKEN;
+const botToken = config.TELEGRAM_BOT_TOKEN;
 // OPENAI
-const apiKey = process.env.OPEN_AI_KEY;
+const apiKey = config.OPEN_AI_KEY;
 const instructions = generateInstructions();
 export const telegramClient = new TelegramClient(botToken, apiKey, instructions);
 

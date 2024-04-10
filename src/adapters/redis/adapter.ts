@@ -1,6 +1,7 @@
 import { createClient } from 'redis';
 import type { RedisClientType } from 'redis';
 import { logger } from '../../helpers/logger.helper';
+import config from '../../env';
 
 export class RedisClientAdapter {
   private client: RedisClientType;
@@ -8,8 +9,8 @@ export class RedisClientAdapter {
   constructor() {
     this.client = createClient({
       socket: {
-        host: process.env.REDIS_HOST || '127.0.0.1',
-        port: parseInt(process.env.REDIS_PORT || '6379', 10),
+        host: config.REDIS_HOST || '127.0.0.1',
+        port: parseInt(config.REDIS_PORT || '6379', 10),
       },
     });
 
